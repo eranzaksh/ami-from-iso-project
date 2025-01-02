@@ -7,28 +7,21 @@ if [ "$#" -ne 3 ]; then
 fi
 
 # Assigning input arguments to variables
-bucketname=$1
-region=$2
-imagename=$3
+BUCKETNAME=$1
+REGION=$2
+IMAGENAME=$3
 
-# Attempt to create the S3 bucket
-aws s3 mb s3://"$bucketname" --region "$region"
-
-# Check if last command return status exit of 0 which means it was successful.
-if [ $? -eq 0 ]; then
-    echo "Bucket '$bucketname' created successfully in region '$region'."
+# Check if bucket already exists.
+if ! aws s3api head-bucket --bucket "$BUCKETNAME" 2>/dev/null; then
+    # If the bucket does not exist, create it
+    aws s3 mb s3://"$BUCKETNAME" --region "$REGION"
+    echo "Bucket '$BUCKETNAME' created successfully."
 else
-    # Check if the error is because the bucket already exists
-    if aws s3api head-bucket --bucket "$bucketname" 2>/dev/null; then
-        echo "Bucket '$bucketname' already exists in region '$region'."
-    else
-        echo "Failed to create bucket '$bucketname'."
-        exit 1 
-    fi
+    echo "Bucket '$BUCKETNAME' already exists."
 fi
 
 echo "Upload the raw img to S3 bucket please wait..."
-aws s3 cp "$imagename" s3://"$bucketname"
+aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
 
 # Create IAM role to import VM
 aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
@@ -47,8 +40,8 @@ cat << EOF > role-policy.json
          "s3:GetBucketAcl"
        ],
        "Resource": [
-         "arn:aws:s3:::$bucketname",
-         "arn:aws:s3:::$bucketname/*"
+         "arn:aws:s3:::$BUCKETNAME",
+         "arn:aws:s3:::$BUCKETNAME/*"
        ]
      },
      {
@@ -62,13 +55,13 @@ cat << EOF > role-policy.json
        "Resource": "*"
      }
    ]
- }
+}
 EOF
 
 # Check if policy exists
-if ! aws iam get-role-policy --role-name vmimport --policy-name vmimport-$bucketname &> /dev/null; then
+if ! aws iam get-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME &> /dev/null; then
     # Attach the policy to the role
-    aws iam put-role-policy --role-name vmimport --policy-name vmimport-$bucketname --policy-document file://role-policy.json
+    aws iam put-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME --policy-document file://role-policy.json
     echo "Policy attached successfully."
 else
     echo "Policy already exists. No changes made."
@@ -81,19 +74,19 @@ cat << EOF > containers.json
     "Description": "My imported VM",
     "Format": "raw",
     "UserBucket": {
-      "S3Bucket": "$bucketname",
-      "S3Key": "$imagename"
+      "S3Bucket": "$BUCKETNAME",
+      "S3Key": "$IMAGENAME"
     }
   }
 ]
 EOF
 # Inside the containers.json i specify where the image path.
 echo "Importing  the image to AMI..."
-IMPORT_TASK_ID=$(aws ec2 import-image --description "My imported VM" --disk-containers file://containers.json --region "$region" --query 'ImportTaskId' --output text)
+IMPORT_TASK_ID=$(aws ec2 import-image --description "My imported VM" --disk-containers file://containers.json --region "$REGION" --query 'ImportTaskId' --output text)
 echo "Import-task-id: " $IMPORT_TASK_ID
 while true; do
     # Describe the import image task
-    IMPORT_TASK_INFO=$(aws ec2 describe-import-image-tasks --import-task-ids $IMPORT_TASK_ID --region $region)
+    IMPORT_TASK_INFO=$(aws ec2 describe-import-image-tasks --import-task-ids $IMPORT_TASK_ID --region $REGION)
     IMPORT_TASK_PROGRESS=$(echo $IMPORT_TASK_INFO | jq '.ImportImageTasks[0].Progress')
     # Extract the AMI ID from the output
     AMI_ID=$(echo $IMPORT_TASK_INFO | jq -r '.ImportImageTasks[0].ImageId')
@@ -107,10 +100,7 @@ while true; do
     # Check the status of the import task
     IMPORT_STATUS=$(echo $IMPORT_TASK_INFO | jq -r '.ImportImageTasks[0].Status')
     
-    if [[ "$IMPORT_STATUS" == "completed" ]]; then
-        echo "Import completed but no AMI ID found."
-        break
-    elif [[ "$IMPORT_STATUS" == "deleted" ]]; then
+    if [[ "$IMPORT_STATUS" == "deleted" ]]; then
         echo "Import task has been deleted."
         exit 1
     elif [[ "$IMPORT_STATUS" == "failed" ]]; then
@@ -123,19 +113,18 @@ while true; do
     echo "Progress: "$IMPORT_TASK_PROGRESS
     sleep 10  # Adjust the sleep duration as needed
 done
-echo "AMI ID: $AMI_ID"
-MY_IP=$(curl -4 ifconfig.me)
 
+MY_IP=$(curl -4 ifconfig.me)
 # Create Terraform tfvars and pass variables
 cat << EOF > terraform.tfvars
-region = "$region"
+region = "$REGION"
 ami = "$AMI_ID"
 allowed_ssh_ips = ["$MY_IP/32"]
 EOF
 
 # Initialize and apply Terraform
 terraform init
-terraform apply -auto-approve
+terraform apply --auto-approve
 
 echo "EC2 instance created using imported image."
 
