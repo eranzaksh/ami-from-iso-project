@@ -11,11 +11,8 @@
 #       qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive file=ubuntu-disk.img,format=raw -m 2048 # specify the format to raw
 # 3. Install the OS on the VM
 # the fs should be formatted to ext4 and the kernel last version is 5.15.0 (ubuntu 22.04.1-4 or ubuntu 23.04)
-# 4. Install open-ssh and 
-# 5. sudo systemctl enable ssh?
-# 6. sudo systemctl start ssh?
 
-# Check user entered 2 arguments
+# Check user entered 3 arguments
 if [ "$#" -ne 3 ]; then
     echo "Usage with arguments: $0 <bucket-name> <region> <image-name>"
     exit 1
