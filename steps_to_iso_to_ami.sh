@@ -27,8 +27,8 @@ else
     fi
 fi
 
-echo "Upload the raw img to S3 bucket please wait..."
-aws s3 cp "$imagename" s3://"$bucketname"
+# echo "Upload the raw img to S3 bucket please wait..."
+# aws s3 cp "$imagename" s3://"$bucketname"
 
 # Create IAM role to import VM
 # aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
@@ -86,21 +86,13 @@ while true; do
     sleep 10  # Adjust the sleep duration as needed
 done
 echo "AMI ID: $AMI_ID"
+MY_IP=$(curl -4 ifconfig.me)
 
-# Create Terraform configuration
-cat << EOF > main.tf
-provider "aws" {
-  region = "$region"
-}
-
-resource "aws_instance" "example" {
-  ami           = "$AMI_ID"
-  instance_type = "t3.micro"
-
-  tags = {
-    Name = "Imported Instance"
-  }
-}
+# Create Terraform tfvars and pass variables
+cat << EOF > terraform.tfvars
+region = $region
+ami = $AMI_ID
+allowed_ssh_ips = $MY_IP
 EOF
 
 # Initialize and apply Terraform
