@@ -1,10 +1,10 @@
 [
   {
-    "Description": "Ubuntu Raw Disk Image",
+    "Description": "My imported VM",
     "Format": "raw",
     "UserBucket": {
-        "S3Bucket": "eran-raw-images",
-        "S3Key": "ubuntu-disk.img"
+      "S3Bucket": "eran-test-script-iso",
+      "S3Key": "ubuntu-2204-disk.img"
     }
   }
 ]

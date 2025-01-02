@@ -20,5 +20,5 @@ the fs should be formatted to ext4(or 3,2) and the ubuntu kernel last version su
 
 5. The script will create a role and policy, create a bucket, upload the img, import the img to be converted to AMI, run an EC2 with that image using Terraform.
  
-# role and policy:
-# https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html#vmimport-role
+* role and policy:
+* https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html#vmimport-role
