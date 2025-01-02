@@ -3,9 +3,9 @@
 This project convert iso ubuntu os file into an AWS AMI.
 
 Steps:
-1. Creating virtual disk image of 10Gb
+1. Create virtual disk image of 10Gb
        qemu-img create -f raw ubuntu-disk.img 10G
-2. Creating a vm with ubuntu image and 2G of RAM and 1 cpu core (default) on the virtual disk image as a raw disk image.
+2. Create a vm with ubuntu image and 2G of RAM and 1 cpu core (default) on the virtual disk image as a raw disk image.
        qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive file=ubuntu-disk.img,format=raw -m 2048
 3. Install the OS on the VM
 the fs should be formatted to ext4(or 3,2) and the ubuntu kernel last version supported is 5.15.0 (ubuntu 22.04.1-4 or ubuntu 23.04)
@@ -19,6 +19,7 @@ the fs should be formatted to ext4(or 3,2) and the ubuntu kernel last version su
     3. image name
 
 5. The script will create a role and policy, create a bucket, upload the img, import the img to be converted to AMI, run an EC2 with that image using Terraform.
+
+6. Terraform create ec2 with the AMI provided and add security group with ssh allowed from the user pc ip.
+    * AMI, region and IP are passed using terraform.tfvars 
  
-* role and policy:
-* https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html#vmimport-role

@@ -27,14 +27,52 @@ else
     fi
 fi
 
-# echo "Upload the raw img to S3 bucket please wait..."
-# aws s3 cp "$imagename" s3://"$bucketname"
+echo "Upload the raw img to S3 bucket please wait..."
+aws s3 cp "$imagename" s3://"$bucketname"
 
 # Create IAM role to import VM
-# aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
+aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
+# Create the IAM policy
+cat << EOF > role-policy.json
+{
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+       "Effect": "Allow",
+       "Action": [
+         "s3:GetBucketLocation",
+         "s3:GetObject",
+         "s3:ListBucket",
+         "s3:PutObject",
+         "s3:GetBucketAcl"
+       ],
+       "Resource": [
+         "arn:aws:s3:::$bucketname",
+         "arn:aws:s3:::$bucketname/*"
+       ]
+     },
+     {
+       "Effect": "Allow",
+       "Action": [
+         "ec2:ModifySnapshotAttribute",
+         "ec2:CopySnapshot",
+         "ec2:RegisterImage",
+         "ec2:Describe*"
+       ],
+       "Resource": "*"
+     }
+   ]
+ }
+EOF
 
-# Attach the policy to the role
-# aws iam put-role-policy --role-name vmimport --policy-name vmimport2 --policy-document file://role-policy.json
+# Check if policy exists
+if ! aws iam get-role-policy --role-name vmimport --policy-name vmimport-$bucketname &> /dev/null; then
+    # Attach the policy to the role
+    aws iam put-role-policy --role-name vmimport --policy-name vmimport-$bucketname --policy-document file://role-policy.json
+    echo "Policy attached successfully."
+else
+    echo "Policy already exists. No changes made."
+fi
 
 # Create containers.json to use when importing the img
 cat << EOF > containers.json
@@ -90,9 +128,9 @@ MY_IP=$(curl -4 ifconfig.me)
 
 # Create Terraform tfvars and pass variables
 cat << EOF > terraform.tfvars
-region = $region
-ami = $AMI_ID
-allowed_ssh_ips = $MY_IP
+region = "$region"
+ami = "$AMI_ID"
+allowed_ssh_ips = ["$MY_IP/32"]
 EOF
 
 # Initialize and apply Terraform
