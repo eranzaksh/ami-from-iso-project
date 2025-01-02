@@ -1,0 +1,10 @@
+[
+  {
+    "Description": "Ubuntu Raw Disk Image",
+    "Format": "raw",
+    "UserBucket": {
+        "S3Bucket": "eran-raw-images",
+        "S3Key": "ubuntu-disk.img"
+    }
+  }
+]
