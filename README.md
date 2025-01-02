@@ -9,10 +9,16 @@ Steps:
        qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive file=ubuntu-disk.img,format=raw -m 2048
 3. Install the OS on the VM
 the fs should be formatted to ext4(or 3,2) and the ubuntu kernel last version supported is 5.15.0 (ubuntu 22.04.1-4 or ubuntu 23.04)
+
+# ubuntu latest kernel supported for linnux VM to convert to ami is 5.15.0
+# https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html
+
 4. After creating the VM - the user can run the steps_iso_to_ami.sh script with 3 arguments which are
     1. bucket name
     2. aws region
     3. image name
 
-5. The script will create a bucket, upload the img, import the img to be converted to AMI, run an EC2 with that image using Terraform.
+5. The script will create a role and policy, create a bucket, upload the img, import the img to be converted to AMI, run an EC2 with that image using Terraform.
  
+# role and policy:
+# https://docs.aws.amazon.com/vm-import/latest/userguide/required-permissions.html#vmimport-role
