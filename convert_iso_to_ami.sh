@@ -6,7 +6,6 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-# Assigning input arguments to variables
 BUCKETNAME=$1
 REGION=$2
 IMAGENAME=$3
@@ -20,8 +19,8 @@ else
     echo "Bucket '$BUCKETNAME' already exists."
 fi
 
-# echo "Upload the raw img to S3 bucket please wait..."
-# aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
+echo "Upload the raw img to S3 bucket please wait..."
+aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
 
 # Check if the role already exists
 if ! aws iam get-role --role-name vmimport &> /dev/null; then
@@ -80,7 +79,7 @@ cat << EOF > containers.json
     "Format": "raw",
     "UserBucket": {
       "S3Bucket": "$BUCKETNAME",
-      "S3Key": "$IMAGENAME"
+      "S3Key": "$(basename $IMAGENAME)"
     }
   }
 ]
@@ -101,7 +100,7 @@ while true; do
         break
     fi
 
-    # Check the status of the import task because if failed or deleted there could be a problem with the os version or kernel for ami
+    # Check the status of the import task because if failed or deleted there could be a problem with the os version or kernel for ami for example
     IMPORT_STATUS=$(echo $IMPORT_TASK_INFO | jq -r '.ImportImageTasks[0].Status')
     
     if [[ "$IMPORT_STATUS" == "deleted" ]]; then
