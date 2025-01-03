@@ -24,6 +24,6 @@ resource "aws_instance" "ami-from-iso" {
   key_name = var.key_name
   vpc_security_group_ids = [aws_security_group.sg_iso.id]
   tags = {
-    Name = "Imported Instance"
+    Name = "EC2 with AMI from ISO"
   }
 }

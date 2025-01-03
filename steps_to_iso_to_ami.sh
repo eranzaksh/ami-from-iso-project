@@ -12,7 +12,7 @@ REGION=$2
 IMAGENAME=$3
 
 # Check if bucket already exists.
-if ! aws s3api head-bucket --bucket "$BUCKETNAME" 2>/dev/null; then
+if ! aws s3api head-bucket --bucket "$BUCKETNAME" &> /dev/null; then
     # If the bucket does not exist, create it
     aws s3 mb s3://"$BUCKETNAME" --region "$REGION"
     echo "Bucket '$BUCKETNAME' created successfully."
@@ -20,11 +20,17 @@ else
     echo "Bucket '$BUCKETNAME' already exists."
 fi
 
-echo "Upload the raw img to S3 bucket please wait..."
-aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
+# echo "Upload the raw img to S3 bucket please wait..."
+# aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
 
-# Create IAM role to import VM
-aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
+# Check if the role already exists
+if ! aws iam get-role --role-name vmimport &> /dev/null; then
+     aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
+    echo "Role 'vmimport' created successfully."
+else
+    echo "Role 'vmimport' already exists. No changes made."
+fi
+
 # Create the IAM policy
 cat << EOF > role-policy.json
 {
@@ -60,7 +66,6 @@ EOF
 
 # Check if policy exists
 if ! aws iam get-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME &> /dev/null; then
-    # Attach the policy to the role
     aws iam put-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME --policy-document file://role-policy.json
     echo "Policy attached successfully."
 else
@@ -88,7 +93,6 @@ while true; do
     # Describe the import image task
     IMPORT_TASK_INFO=$(aws ec2 describe-import-image-tasks --import-task-ids $IMPORT_TASK_ID --region $REGION)
     IMPORT_TASK_PROGRESS=$(echo $IMPORT_TASK_INFO | jq '.ImportImageTasks[0].Progress')
-    # Extract the AMI ID from the output
     AMI_ID=$(echo $IMPORT_TASK_INFO | jq -r '.ImportImageTasks[0].ImageId')
 
     # Check if the AMI ID is available
@@ -97,7 +101,7 @@ while true; do
         break
     fi
 
-    # Check the status of the import task
+    # Check the status of the import task because if failed or deleted there could be a problem with the os version or kernel for ami
     IMPORT_STATUS=$(echo $IMPORT_TASK_INFO | jq -r '.ImportImageTasks[0].Status')
     
     if [[ "$IMPORT_STATUS" == "deleted" ]]; then
@@ -108,10 +112,9 @@ while true; do
         exit 1
     fi
 
-    # Wait for a few seconds before checking again
     echo "Waiting for AMI ID to become available..."
     echo "Progress: "$IMPORT_TASK_PROGRESS
-    sleep 10  # Adjust the sleep duration as needed
+    sleep 10
 done
 
 MY_IP=$(curl -4 ifconfig.me)
@@ -128,9 +131,6 @@ terraform apply --auto-approve
 
 echo "EC2 instance created using imported image."
 
-
-# import the image:
-# https://docs.aws.amazon.com/vm-import/latest/userguide/import-vm-image.html
 
 
 
