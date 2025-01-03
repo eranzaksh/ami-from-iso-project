@@ -4,7 +4,7 @@ This project convert iso ubuntu os file into an AWS AMI.
 
 Steps:
 1. Install qemu-utils and qemu system
-      sudo apt install -y qemu-utils qemu-system-x86
+       sudo apt install -y qemu-utils qemu-system-x86
 2. Create virtual disk image of 10Gb
        qemu-img create -f raw ubuntu-disk.img 10G
 3. Create a vm with ubuntu image and 2G of RAM and 1 cpu core (default) on the virtual disk image as a raw disk image.
