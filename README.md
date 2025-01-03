@@ -30,7 +30,7 @@ qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive fi
 - Format the filesystem to ext4 (or ext3, ext2)
 - Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1-4 or 23.04)
 
-> **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html).
+> **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
 
 ### 5. Run Conversion Script
 
