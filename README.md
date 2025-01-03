@@ -29,8 +29,9 @@ qemu-img create -f raw ubuntu-disk.img 10G
 qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive file=ubuntu-disk.img,format=raw -m 2048
 ```
 * Can also use VirtualBox for example and create ova with this command:
-       -  VBoxManage export eran-2204-ova (name of the vm) -o ubuntu-2204.ova (name for .ova)
-       
+```bash
+VBoxManage export eran-2204-ova (name of the vm) -o ubuntu-2204.ova (name for .ova)
+```
 ### 4. Install Ubuntu OS
 - Format the filesystem to ext4 (or ext3, ext2)
 - Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
