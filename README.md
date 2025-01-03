@@ -56,4 +56,5 @@ Terraform will:
 - Configure a security group allowing SSH access from the user pc's IP
 
 > **Note**: AMI ID, region, and your IP are passed using `terraform.tfvars`. You can also specify a `key_name` for the SSH key pair.
- 
+ ### Print screen from the created AMI terminal
+ ![Terminal screenshot](Screenshot_from_terminal.png)
