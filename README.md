@@ -33,7 +33,7 @@ qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive fi
 VBoxManage export eran-2204-ova (name of the vm) -o ubuntu-2204.ova (name for .ova)
 ```
 ### 4. Install Ubuntu OS
-- Format the filesystem to ext4 (or ext3, ext2)
+- Format the filesystem according to AWS VM Import/Export Prerequisites(for linux ext2, ext3, ext4, Btrfs, JFS, XFS are supported)
 - Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
 
 > **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
