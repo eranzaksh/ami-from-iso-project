@@ -4,11 +4,11 @@ This project converts an Ubuntu ISO file into an AWS AMI.
 
 ## Overview
 
-This tool automates the process of uploading and then converting a raw disk image to an AMI that can be used to launch EC2 instances and launch one ec2 instance with this AMI.
+This tool automates the process of uploading and then converting a raw disk image (or other formats which fit AWS prerequisites) to an AMI that can be used to launch EC2 instances and launch one ec2 instance with this AMI.
 
 ## Prerequisites
 
-- QEMU
+- QEMU or any VM software
 - AWS CLI
 - Terraform
 - Ubuntu ISO file (version 22.04.1 recommended for the most updated ubuntu version *currently* supported)
@@ -28,7 +28,9 @@ qemu-img create -f raw ubuntu-disk.img 10G
 ```bash
 qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive file=ubuntu-disk.img,format=raw -m 2048
 ```
-
+* Can also use VirtualBox for example and create ova with this command:
+       -  VBoxManage export eran-2204-ova (name of the vm) -o ubuntu-2204.ova (name for .ova)
+       
 ### 4. Install Ubuntu OS
 - Format the filesystem to ext4 (or ext3, ext2)
 - Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
@@ -46,8 +48,9 @@ Execute `convert_iso_to_ami.sh` with the following arguments:
 1. Bucket name
 2. AWS region
 3. path/to/image.name
+4. Format type
 ```bash
-./convert_iso_to_ami.sh <bucket_name> <aws_region> <image_name>
+./convert_iso_to_ami.sh <bucket_name> <aws_region> <image_name> <format_type>
 ```
 This script will:
 - Create necessary IAM roles and policies
@@ -62,7 +65,7 @@ Terraform will:
 - Create an EC2 instance using the new AMI
 - Configure a security group allowing SSH access from the user pc's IP
 
-Credentials for EC2:
+Credentials for EC2 login:
 - username: eran-ubuntu
 - password: 123
 
