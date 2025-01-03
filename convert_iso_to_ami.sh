@@ -1,33 +1,33 @@
 #!/bin/bash
 
 # Check user entered 3 arguments
-if [ "$#" -ne 3 ]; then
-    echo "Usage with arguments: $0 <bucket-name> <region> <image-name>"
+if [ "$#" -ne 4 ]; then
+    echo "Usage with arguments: $0 <bucket-name> <region> <image-name> <format-type>"
     exit 1
 fi
 
 BUCKETNAME=$1
 REGION=$2
 IMAGENAME=$3
+FORMAT=$4
 
-# Check if bucket already exists.
-if ! aws s3api head-bucket --bucket "$BUCKETNAME" &> /dev/null; then
-    # If the bucket does not exist, create it
+# Check if bucket already exists. this command returns bucket details or error if not exist.
+if aws s3api head-bucket --bucket "$BUCKETNAME" &> /dev/null; then
+    echo "Bucket '$BUCKETNAME' already exists."
+else
     aws s3 mb s3://"$BUCKETNAME" --region "$REGION"
     echo "Bucket '$BUCKETNAME' created successfully."
-else
-    echo "Bucket '$BUCKETNAME' already exists."
 fi
 
-echo "Upload the raw img to S3 bucket please wait..."
+echo "Uploading the VM img to S3 bucket please wait..."
 aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
 
 # Check if the role already exists
-if ! aws iam get-role --role-name vmimport &> /dev/null; then
-     aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
-    echo "Role 'vmimport' created successfully."
-else
+if aws iam get-role --role-name vmimport &> /dev/null; then
     echo "Role 'vmimport' already exists. No changes made."
+else
+    aws iam create-role --role-name vmimport --assume-role-policy-document file://trust-policy.json
+    echo "Role 'vmimport' created successfully."
 fi
 
 # Create the IAM policy
@@ -64,11 +64,11 @@ cat << EOF > role-policy.json
 EOF
 
 # Check if policy exists
-if ! aws iam get-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME &> /dev/null; then
+if aws iam get-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME &> /dev/null; then
+    echo "Policy already exists. No changes made."
+else
     aws iam put-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME --policy-document file://role-policy.json
     echo "Policy attached successfully."
-else
-    echo "Policy already exists. No changes made."
 fi
 
 # Create containers.json to use when importing the img
@@ -76,7 +76,7 @@ cat << EOF > containers.json
 [
   {
     "Description": "My imported VM",
-    "Format": "raw",
+    "Format": "$FORMAT",
     "UserBucket": {
       "S3Bucket": "$BUCKETNAME",
       "S3Key": "$(basename $IMAGENAME)"
@@ -84,8 +84,8 @@ cat << EOF > containers.json
   }
 ]
 EOF
-# Inside the containers.json i specify where the image path.
-echo "Importing  the image to AMI..."
+
+echo "Importing the image and converting to AMI..."
 IMPORT_TASK_ID=$(aws ec2 import-image --description "My imported VM" --disk-containers file://containers.json --region "$REGION" --query 'ImportTaskId' --output text)
 echo "Import-task-id: " $IMPORT_TASK_ID
 while true; do
