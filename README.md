@@ -11,7 +11,7 @@ This tool automates the process of uploading and then converting a raw disk imag
 - QEMU
 - AWS CLI
 - Terraform
-- Ubuntu ISO file (version 22.04.1-4 or 23.04 recommended for the most updated ubuntu version *currently* supported)
+- Ubuntu ISO file (version 22.04.1 recommended for the most updated ubuntu version *currently* supported)
 
 ## Steps
 
@@ -28,19 +28,19 @@ qemu-system-x86_64 -boot d -cdrom ubuntu-24.04.1-live-server-amd64.iso -drive fi
 
 ### 4. Install Ubuntu OS
 - Format the filesystem to ext4 (or ext3, ext2)
-- Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1-4 or 23.04)
+- Use Ubuntu kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
 
 > **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
 
 ### 5. Run Conversion Script
 
-Execute `steps_iso_to_ami.sh` with the following arguments:
+Execute `convert_iso_to_ami.sh` with the following arguments:
 
 1. Bucket name
 2. AWS region
 3. Image name
 
-./steps_iso_to_ami.sh <bucket_name> <aws_region> <image_name>
+./convert_iso_to_ami.sh <bucket_name> <aws_region> <image_name>
 
 This script will:
 - Create necessary IAM roles and policies
