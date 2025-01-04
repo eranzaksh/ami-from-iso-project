@@ -45,7 +45,7 @@ Execute `convert_iso_to_ami.sh` with the following arguments:
 ./convert_iso_to_ami.sh <bucket_name> <aws_region> <image_name> <format_type>
 ```
 This script will:
-- Ask you if you also want to use the "create_autoinstaller_iso.sh"
+- Let you choose if you also want to use the "create_autoinstaller_iso.sh" to create an ova.
 - Create necessary IAM roles and policies
 - Create an S3 bucket
 - Upload the image
