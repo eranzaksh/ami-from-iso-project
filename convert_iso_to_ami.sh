@@ -10,7 +10,7 @@ BUCKETNAME=$1
 REGION=$2
 IMAGENAME=$3
 FORMAT=$4
-read -p "Do you want to run to create autoinstaller as well? (y/n): " choice
+read -p "Do you want to first create an ova file from ubuntu iso? (y/n): " choice
 
 if [[ $choice == "y" ]]; then
     cd iso_install
@@ -22,6 +22,7 @@ else
     echo "Autoinstaller script will not run."
 fi
 
+echo "Checking if bucket $BUCKETNAME exists..."
 # Check if bucket already exists. this command returns bucket details or error if not exist.
 if aws s3api head-bucket --bucket "$BUCKETNAME" &> /dev/null; then
     echo "Bucket '$BUCKETNAME' already exists."

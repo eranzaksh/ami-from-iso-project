@@ -4,7 +4,13 @@ AUTOINSTALLER_DIR="ubuntu-iso-sources"
 mkdir $AUTOINSTALLER_DIR
 IMAGENAME=$1
 FORMAT=$2
+read -p "Do you want to also download the ubuntu 22.04.1 iso? (y/n): " choice
 
+if [[ $choice == "y" ]]; then
+    echo "Downloading ubuntu-22.04.1-live-server.iso"
+    wget https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-live-server-amd64.iso
+fi
+# Extract the official ubuntu iso
 7z -y x ubuntu-22.04.1-live-server-amd64.iso -oubuntu-iso-sources
 
 mv $AUTOINSTALLER_DIR/[BOOT] ./BOOT
@@ -29,6 +35,7 @@ mkdir -p $AUTOINSTALLER_DIR/server
 cp user-data $AUTOINSTALLER_DIR/server/
 touch $AUTOINSTALLER_DIR/server/meta-data
 
+# Creating a new iso with autoinstall and user-data
 cd $AUTOINSTALLER_DIR
 echo "Creating an autoinstaller iso..."
 xorriso -as mkisofs -r \
@@ -55,23 +62,19 @@ sleep 1
 VBoxManage createvm --name "UbuntuServer" --register --ostype "Ubuntu_64"
 VBoxManage modifyvm "UbuntuServer" --memory 4096 --cpus 4
 
-# Create a virtual hard disk in VDI format
 VBoxManage createhd --filename ~/VirtualBox\ VMs/UbuntuServer/ubuntu-disk.vdi --size 10240 --format VDI
 
-# Create a SATA controller if it doesn't exist (recommended)
 VBoxManage storagectl "UbuntuServer" --name "SATA Controller" --add sata --controller IntelAhci
 
-# Attach the hard disk to the SATA controller
 VBoxManage storageattach "UbuntuServer" --storagectl "SATA Controller" --port 0 --device 0 --type hdd --medium ~/VirtualBox\ VMs/UbuntuServer/ubuntu-disk.vdi
 
-# Attach the autoinstall ISO to the VM's CD/DVD drive (using SATA)
 VBoxManage storageattach "UbuntuServer" --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium ./ubuntu-22.04-autoinstall.iso
 VBoxManage modifyvm "UbuntuServer" --boot1 dvd
 
 VBoxManage startvm "UbuntuServer" --type headless
 
 VM_NAME="UbuntuServer"
-
+# Wait for the VM to power off according to the user-data config
 is_powered_off() {
     status=$(VBoxManage showvminfo "$VM_NAME" --machinereadable | grep ^VMState=)
     [[ "$status" == *"poweroff"* ]]
