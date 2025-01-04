@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt update && sudo apt install -y 7zip wget xorriso whois
-
+AUTOINSTALLER_DIR="ubuntu-iso-sources"
 mkdir ubuntu-iso-sources
 
 7z -y x ubuntu-22.04.1-live-server-amd64.iso -oubuntu-iso-sources
