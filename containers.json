@@ -3,8 +3,8 @@
     "Description": "My imported VM",
     "Format": "ova",
     "UserBucket": {
-      "S3Bucket": "eran-test-auto-iso",
-      "S3Key": "ubuntu-2204.ova"
+      "S3Bucket": "eran-auto-iso-to-ami",
+      "S3Key": "ubuntu-220401.ova"
     }
   }
 ]

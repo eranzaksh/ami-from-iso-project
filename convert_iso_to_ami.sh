@@ -2,7 +2,7 @@
 
 # Check user entered 3 arguments
 if [ "$#" -ne 4 ]; then
-    echo "Usage with arguments: $0 <bucket-name> <region> <image-name> <format-type>"
+    echo "Usage with arguments: $0 <bucket-name> <region> <image-name (Without extension)> <format-type>"
     exit 1
 fi
 
@@ -17,9 +17,9 @@ if [[ $choice == "y" ]]; then
     ./create_autoinstaller_iso.sh $IMAGENAME $FORMAT
     sleep 2
     cd ..
-    cp iso_install/$IMAGENAME .
+    cp iso_install/$IMAGENAME.$FORMAT .
 else
-    echo "Second script will not run."
+    echo "Autoinstaller script will not run."
 fi
 
 # Check if bucket already exists. this command returns bucket details or error if not exist.
@@ -31,7 +31,7 @@ else
 fi
 
 echo "Uploading the VM img to S3 bucket please wait..."
-aws s3 cp "$IMAGENAME" s3://"$BUCKETNAME"
+aws s3 cp "$IMAGENAME.$FORMAT" s3://"$BUCKETNAME"
 
 # Check if the role already exists
 if aws iam get-role --role-name vmimport &> /dev/null; then
@@ -73,7 +73,7 @@ cat << EOF > role-policy.json
    ]
 }
 EOF
-
+sleep 2
 # Check if policy exists
 if aws iam get-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME &> /dev/null; then
     echo "Policy already exists. No changes made."
@@ -91,7 +91,7 @@ cat << EOF > containers.json
     "Format": "$FORMAT",
     "UserBucket": {
       "S3Bucket": "$BUCKETNAME",
-      "S3Key": "$(basename $IMAGENAME)"
+      "S3Key": "$(basename $IMAGENAME.$FORMAT)"
     }
   }
 ]

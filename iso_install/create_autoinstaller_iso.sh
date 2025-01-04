@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# sudo apt update && sudo apt install -y 7zip wget xorriso whois
 AUTOINSTALLER_DIR="ubuntu-iso-sources"
 mkdir $AUTOINSTALLER_DIR
 IMAGENAME=$1
@@ -89,5 +88,5 @@ echo "Exporting ova file..."
 VBoxManage export UbuntuServer -o $IMAGENAME.$FORMAT
 echo "ova file exported successfully!"
 sleep 2
-echo "Deleting $VM_NAME for later runs"
+echo "Deleting the $VM_NAME vm for later runs"
 VBoxManage unregistervm $VM_NAME --delete
