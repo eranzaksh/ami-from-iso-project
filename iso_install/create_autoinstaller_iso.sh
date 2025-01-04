@@ -75,8 +75,8 @@ VBoxManage storageattach "UbuntuServer" --storagectl "SATA Controller" --port 0 
 
 # Attach the autoinstall ISO to the VM's CD/DVD drive (using SATA)
 VBoxManage storageattach "UbuntuServer" --storagectl "SATA Controller" --port 1 --device 0 --type dvddrive --medium ./ubuntu-22.04-autoinstall.iso
-VBoxManage modifyvm "UbuntuServer" --boot1 dvd --boot2 disk
-
+VBoxManage modifyvm "UbuntuServer" --boot1 dvd
+#  --boot2 disk
 VBoxManage startvm "UbuntuServer" 
 # --type headless
 

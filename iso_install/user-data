@@ -1,0 +1,34 @@
+#cloud-config
+autoinstall:
+  version: 1
+  keyboard:
+    layout: us
+  identity:
+    hostname: ubuntu-vm
+    username: eran-ubuntu
+    password: "$6$v/1adUEzK5XImsFn$7FfL/wJgrLD2dacY0gqt4Dk0krDnxxPr1AqSv/ziDybOyKXca.yKBIH3wDkg25zW8Qh08z5vDvaFz9lc1R2Bw/"
+  ssh:
+    install-server: true
+    allow-pw: true
+  network:
+    version: 2
+    ethernets:
+      enp0s3:
+        dhcp4: true
+  shutdown: poweroff
+  # storage:
+  #   layout:
+  #     name: direct
+  #   config:
+  #     - type: disk
+  #       id: /dev/sda
+  #       match:
+  #         size: 10737418240 
+  #       ptable: gpt
+  #       path: /dev/sda
+  #       format: ext4
+  #       mount: /
+  
+ 
+# late-commands:
+#   - curtin in-target --target=/target shutdown -h now
