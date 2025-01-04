@@ -4,7 +4,7 @@ This project converts an Ubuntu ISO file into an AWS AMI.
 
 ## Overview
 
-This tool automates the process of creating VM installing ubuntu os on it and then uploading and converting an ova (or other formats which fit AWS prerequisites) to an AMI that can be used to launch EC2 instances and launch one ec2 instance with this AMI.
+This tool fully automates the process of creating VM installing ubuntu os on it, exoporting ova file and then uploading and converting it (or other formats which fit AWS prerequisites) to an AMI that can be used to launch EC2 instances and launch one ec2 instance with this AMI.
 
 ## Prerequisites
 
