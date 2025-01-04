@@ -1,36 +1,36 @@
 #!/bin/bash
 
-sudo apt update && sudo apt install -y 7zip wget xorriso whois
+# sudo apt update && sudo apt install -y 7zip wget xorriso whois
 AUTOINSTALLER_DIR="ubuntu-iso-sources"
-mkdir ubuntu-iso-sources
+mkdir $AUTOINSTALLER_DIR
+IMAGENAME=$1
+FORMAT=$2
 
 7z -y x ubuntu-22.04.1-live-server-amd64.iso -oubuntu-iso-sources
 
-cd ubuntu-iso-sources
+mv $AUTOINSTALLER_DIR/[BOOT] ./BOOT
 
-mv \[BOOT\] ../BOOT
-cd ..
-GRUB_CFG="./ubuntu-iso-sources/boot/grub/grub.cfg"
+GRUB_CFG="./$AUTOINSTALLER_DIR/boot/grub/grub.cfg"
 MENU_ENTRY='menuentry "Autoinstall Ubuntu Server" {
     set gfxpayload=keep
     linux   /casper/vmlinuz quiet autoinstall ds=nocloud\\;s=/cdrom/server/  ---
     initrd  /casper/initrd
 }'
 if ! grep -q "Autoinstall Ubuntu Server" "$GRUB_CFG"; then
-    # If it doesn't exist, use awk to insert the menu entry after line 7
+    # If file doesn't exist, use awk to insert the menu entry after line 7
     awk -v new_entry="$MENU_ENTRY" 'NR==7 {print; print new_entry; next} 1' "$GRUB_CFG" > temp.cfg && mv temp.cfg "$GRUB_CFG"
     echo "Menu entry added successfully."
 else
     echo "Menu entry already exists."
 fi
 
-echo "moving user-data to ubuntu-iso-sources/server/"
+echo "moving user-data to $AUTOINSTALLER_DIR/server/"
 
-mkdir -p ubuntu-iso-sources/server
-cp user-data ubuntu-iso-sources/server/
-touch ubuntu-iso-sources/server/meta-data
+mkdir -p $AUTOINSTALLER_DIR/server
+cp user-data $AUTOINSTALLER_DIR/server/
+touch $AUTOINSTALLER_DIR/server/meta-data
 
-cd ubuntu-iso-sources
+cd $AUTOINSTALLER_DIR
 echo "Creating an autoinstaller iso..."
 xorriso -as mkisofs -r \
   -V 'Ubuntu 22.04 LTS (Auto Install)' \
@@ -84,7 +84,10 @@ while ! is_powered_off; do
 done
 
 echo "VM $VM_NAME has powered off"
-sleep 1
+sleep 2
 echo "Exporting ova file..."
-VBoxManage export UbuntuServer -o ubuntu-2204.ova
+VBoxManage export UbuntuServer -o $IMAGENAME.$FORMAT
 echo "ova file exported successfully!"
+sleep 2
+echo "Deleting $VM_NAME for later runs"
+VBoxManage unregistervm $VM_NAME --delete

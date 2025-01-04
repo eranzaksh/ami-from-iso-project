@@ -11,8 +11,8 @@
          "s3:GetBucketAcl"
        ],
        "Resource": [
-         "arn:aws:s3:::eran-test-script-iso",
-         "arn:aws:s3:::eran-test-script-iso/*"
+         "arn:aws:s3:::eran-test-auto-iso",
+         "arn:aws:s3:::eran-test-auto-iso/*"
        ]
      },
      {

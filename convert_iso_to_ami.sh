@@ -10,6 +10,17 @@ BUCKETNAME=$1
 REGION=$2
 IMAGENAME=$3
 FORMAT=$4
+read -p "Do you want to run to create autoinstaller as well? (y/n): " choice
+
+if [[ $choice == "y" ]]; then
+    cd iso_install
+    ./create_autoinstaller_iso.sh $IMAGENAME $FORMAT
+    sleep 2
+    cd ..
+    cp iso_install/$IMAGENAME .
+else
+    echo "Second script will not run."
+fi
 
 # Check if bucket already exists. this command returns bucket details or error if not exist.
 if aws s3api head-bucket --bucket "$BUCKETNAME" &> /dev/null; then
@@ -30,7 +41,7 @@ else
     echo "Role 'vmimport' created successfully."
 fi
 
-# Create the IAM policy
+echo "Creating the IAM policy..."
 cat << EOF > role-policy.json
 {
    "Version": "2012-10-17",
@@ -70,7 +81,8 @@ else
     aws iam put-role-policy --role-name vmimport --policy-name vmimport-$BUCKETNAME --policy-document file://role-policy.json
     echo "Policy attached successfully."
 fi
-
+# Give time for policy to be attached
+sleep 5
 # Create containers.json to use when importing the img
 cat << EOF > containers.json
 [
@@ -88,6 +100,7 @@ EOF
 echo "Importing the image and converting to AMI..."
 IMPORT_TASK_ID=$(aws ec2 import-image --description "My imported VM" --disk-containers file://containers.json --region "$REGION" --query 'ImportTaskId' --output text)
 echo "Import-task-id: " $IMPORT_TASK_ID
+
 while true; do
     # Describe the import image task
     IMPORT_TASK_INFO=$(aws ec2 describe-import-image-tasks --import-task-ids $IMPORT_TASK_ID --region $REGION)
@@ -117,7 +130,7 @@ while true; do
 done
 
 MY_IP=$(curl -4 ifconfig.me)
-# Create Terraform tfvars and pass variables
+echo "Create Terraform tfvars and pass variables"
 cat << EOF > terraform.tfvars
 region = "$REGION"
 ami = "$AMI_ID"

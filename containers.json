@@ -1,10 +1,10 @@
 [
   {
     "Description": "My imported VM",
-    "Format": "raw",
+    "Format": "ova",
     "UserBucket": {
-      "S3Bucket": "eran-test-script-iso",
-      "S3Key": "ubuntu-2204-disk.img"
+      "S3Bucket": "eran-test-auto-iso",
+      "S3Key": "ubuntu-2204.ova"
     }
   }
 ]
