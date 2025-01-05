@@ -119,9 +119,11 @@ while true; do
     
     if [[ "$IMPORT_STATUS" == "deleted" ]]; then
         echo "Import task has been deleted."
+        echo $IMPORT_TASK_INFO
         exit 1
     elif [[ "$IMPORT_STATUS" == "failed" ]]; then
         echo "Import task failed."
+        echo $IMPORT_TASK_INFO
         exit 1
     fi
 
