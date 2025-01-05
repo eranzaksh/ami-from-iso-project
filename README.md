@@ -12,10 +12,11 @@ This tool fully automates the process of creating VM installing ubuntu os on it,
 - AWS CLI
 - AWS credentials
 - Terraform
-- Ubuntu ISO file (version 22.04.1 recommended for the most updated ubuntu version *currently* supported)
-- Use Ubuntu with kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
+- Ubuntu ISO file
+- Recommended: Ubuntu 22.04.1 with kernel version 5.15.0 or earlier.
+- For details, refer to the [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html).
 
-> **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
+> **Note**: The latest supported kernel version for conversion is **5.15.0**.
 
 ## Steps
 
