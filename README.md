@@ -10,8 +10,12 @@ This tool fully automates the process of creating VM installing ubuntu os on it,
 
 - VirtualBox
 - AWS CLI
+- AWS credentials
 - Terraform
 - Ubuntu ISO file (version 22.04.1 recommended for the most updated ubuntu version *currently* supported)
+- Use Ubuntu with kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
+
+> **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
 
 ## Steps
 
@@ -25,14 +29,10 @@ git clone https://github.com/eranzaksh/ami-from-iso-project.git
 sudo apt install -y virtualbox 7zip xorriso
 ```
 
-### 3. Download ubuntu live server version 22.04.1
+### 3. Modify user-data with your configuration
 ```bash
-1. wget https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-live-server-amd64.iso
-2. Move the ubuntu iso to iso_install directory
+1. vim iso_install/user-data
 ```
-- Use Ubuntu with kernel version 5.15.0 or earlier (Ubuntu 22.04.1)
-
-> **Note**: The latest Ubuntu kernel supported for Linux VM to convert to AMI is 5.15.0. For more details, see [AWS VM Import/Export Prerequisites](https://docs.aws.amazon.com/vm-import/latest/userguide/prerequisites.html > Image formats supported by VM Import/Export).
 
 ### 4. Run Conversion Script
 Execute `convert_iso_to_ami.sh` with the following arguments:
