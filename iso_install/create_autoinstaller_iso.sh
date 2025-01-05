@@ -1,18 +1,22 @@
 #!/bin/bash
 
-AUTOINSTALLER_DIR="ubuntu-iso-sources"
-mkdir $AUTOINSTALLER_DIR
 IMAGENAME=$1
 FORMAT=$2
+
+AUTOINSTALLER_DIR="ubuntu-iso-sources"
+ISO_IMG="https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-live-server-amd64.iso"
+
+mkdir $AUTOINSTALLER_DIR
+
 read -p "Do you want to also download the ubuntu 22.04.1 iso? (y/n): " choice
 
 if [[ $choice == "y" ]]; then
     echo "Downloading ubuntu-22.04.1-live-server.iso"
-    wget https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-live-server-amd64.iso
+    wget $ISO_IMG
 fi
 # Extract the official ubuntu iso
-7z -y x ubuntu-22.04.1-live-server-amd64.iso -oubuntu-iso-sources
-
+7z -y x ubuntu-22.04.1-live-server-amd64.iso -o$AUTOINSTALLER_DIR
+# This is not needed in the final ISO
 mv $AUTOINSTALLER_DIR/[BOOT] ./BOOT
 
 GRUB_CFG="./$AUTOINSTALLER_DIR/boot/grub/grub.cfg"
@@ -22,7 +26,7 @@ MENU_ENTRY='menuentry "Autoinstall Ubuntu Server" {
     initrd  /casper/initrd
 }'
 if ! grep -q "Autoinstall Ubuntu Server" "$GRUB_CFG"; then
-    # If file doesn't exist, use awk to insert the menu entry after line 7
+    # If autoinstall doesn't exist, use awk to insert the menu entry after line 7
     awk -v new_entry="$MENU_ENTRY" 'NR==7 {print; print new_entry; next} 1' "$GRUB_CFG" > temp.cfg && mv temp.cfg "$GRUB_CFG"
     echo "Menu entry added successfully."
 else

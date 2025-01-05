@@ -16,19 +16,3 @@ autoinstall:
       enp0s3:
         dhcp4: true
   shutdown: poweroff
-  # storage:
-  #   layout:
-  #     name: direct
-  #   config:
-  #     - type: disk
-  #       id: /dev/sda
-  #       match:
-  #         size: 10737418240 
-  #       ptable: gpt
-  #       path: /dev/sda
-  #       format: ext4
-  #       mount: /
-  
- 
-# late-commands:
-#   - curtin in-target --target=/target shutdown -h now
