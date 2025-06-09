@@ -19,5 +19,5 @@ variable "allowed_ssh_ips" {
 variable "key_name" {
   type = string
   description = "Name of the ssh key"
-  default = "eranssh"
+  default = "default"
 }
